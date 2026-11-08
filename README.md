@@ -67,3 +67,37 @@ Developed as a Compiler Design mini-project to demonstrate lexical analysis, rul
 The Dockerfile installs a C++ compiler, generates the scanner from the project rules, compiles it for the Linux host, and starts the Python web server. The Windows `start.bat` launcher remains available for local use.
 
 Note: Free Render services can spin down after inactivity, so the first visit may take a little longer.
+
+## Live Demo
+
+**Public website:** https://lex-tool-cpp.onrender.com/
+
+**GitHub:** https://github.com/Naina-Ohri/LEX-Tool-CPP
+
+The project is deployed on Render and can be tested directly in a browser.
+
+## Verified Features
+
+- C++17 lexical scanner generator
+- Keywords, identifiers and numeric literals
+- Character and string literals
+- Operators and punctuation
+- Comment handling and whitespace skipping
+- Lexical errors with line and column reporting
+- Browser-based source code editor and token results
+
+## Technologies
+
+- C++17
+- Python 3
+- HTML, CSS and JavaScript
+- Docker
+- Render hosting
+
+## Testing
+
+The local scanner pipeline tests passed. Live browser tests verified token recognition, comments and lexical error reporting.
+
+## Run Locally
+
+Run .\start.bat in Windows PowerShell.
