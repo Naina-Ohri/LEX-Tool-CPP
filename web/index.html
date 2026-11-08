@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEX Tool | Lexical Analyzer</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2d;--line:#283550;--text:#edf2ff;--muted:#9ba9c4;--accent:#72a7ff;--green:#52d6a0;--red:#ff7885}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+header{padding:25px max(22px,calc((100% - 1180px)/2));border-bottom:1px solid var(--line);background:#10182b}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{background:#254777;color:#fff;padding:10px 13px;border-radius:12px;font-weight:800;font-size:20px}
+h1{margin:0;font-size:24px}
+.subtitle{color:var(--muted);margin-top:3px}
+main{max-width:1180px;margin:26px auto;padding:0 20px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+h2{font-size:17px;margin:0 0 12px}
+button{border:1px solid var(--line);background:#1a2640;color:var(--text);padding:10px 15px;border-radius:9px;cursor:pointer;font-weight:600}
+button:hover{border-color:var(--accent)}
+.primary{background:#3776dc;border-color:#3776dc;color:white}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+textarea{display:block;width:100%;min-height:330px;resize:vertical;background:#080d19;color:#d8e5ff;border:1px solid var(--line);border-radius:10px;padding:15px;font:14px/1.7 Consolas,monospace;tab-size:4;outline:none}
+textarea:focus{border-color:var(--accent)}
+.hint{color:var(--muted);font-size:13px;margin-top:9px}
+.status{color:var(--muted);font-size:13px}
+.stats{display:flex;gap:9px;margin:0 0 15px}
+.stat{background:#0c1425;border:1px solid var(--line);padding:9px 12px;border-radius:9px;flex:1}
+.stat strong{display:block;font-size:22px}
+.stat span{color:var(--muted);font-size:12px}
+.tablewrap{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:9px}
+table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+th{background:#19243a;color:#b9c9e8;position:sticky;top:0}
+td:first-child{color:#83b5ff;font-weight:600}
+.empty{color:var(--muted);padding:22px;text-align:center}
+.errorbox{margin-top:15px;background:#291720;border:1px solid #62303c;border-radius:10px;padding:12px;color:#ffadb5;white-space:pre-wrap;overflow-wrap:anywhere}
+.errorbox.good{background:#10251f;border-color:#235743;color:#91e8c3}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}textarea{min-height:260px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">LEX</div><div><h1>LEX Tool</h1><div class="subtitle">C++ Lexical Analyzer &amp; Scanner Generator Demo</div></div></div></header>
+<main>
+<div class="toolbar"><div><strong>Lexical Analysis Workbench</strong><div class="status">Try literals, operators, comments, and lexical errors.</div></div><div class="actions"><button id="sample">Load Sample</button><button id="clear">Clear</button><button class="primary" id="run">▶ Run Lexer</button></div></div>
+<div class="grid">
+<section class="panel">
+<h2>Source Code</h2>
+<textarea id="code" spellcheck="false" aria-label="Source code" placeholder="Enter C-like code here...">int total = 25;
+if total >= 20
+    return total;</textarea>
+<div class="hint">Supports the sample rule set. Try adding @ to test line-and-column error reporting.</div>
+</section>
+<section class="panel">
+<h2>Analysis Results</h2>
+<div class="stats"><div class="stat"><strong id="tokenCount">0</strong><span>Tokens</span></div><div class="stat"><strong id="errorCount">0</strong><span>Errors</span></div></div>
+<div class="tablewrap"><table><thead><tr><th>Token Type</th><th>Lexeme</th></tr></thead><tbody id="rows"><tr><td colspan="2" class="empty">Run the lexer to see results.</td></tr></tbody></table></div>
+<div id="message" class="errorbox good">Ready to analyze source code.</div>
+</section>
+</div>
+</main>
+<footer>LEX Tool · Simplified LEX-inspired scanner generator implemented in C++</footer>
+<script>
+const code=document.getElementById('code'),rows=document.getElementById('rows'),message=document.getElementById('message');
+const sample=`int total = 12;
+float ratio = 3.25;
+char grade = 'A';
+text = "value // inside a string";
+// This comment is skipped
+/* This block comment
+   spans two lines */
+if (total >= 10 && ratio != 0.0) {
+    total += 1;
+    total++;
+    return total;
+}`;
+document.getElementById('sample').onclick=()=>{code.value=sample;};
+document.getElementById('clear').onclick=()=>{code.value='';rows.innerHTML='<tr><td colspan="2" class="empty">Enter code and run the lexer.</td></tr>';document.getElementById('tokenCount').textContent='0';document.getElementById('errorCount').textContent='0';message.className='errorbox good';message.textContent='Cleared.';};
+document.getElementById('run').onclick=async()=>{
+ const btn=document.getElementById('run');btn.disabled=true;btn.textContent='Running...';message.className='errorbox good';message.textContent='Analyzing source code...';
+ try{
+  const response=await fetch('/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code.value})});
+  const data=await response.json();if(!response.ok||data.error)throw new Error(data.error||'Could not run scanner.');
+  rows.replaceChildren();
+  if(!data.tokens.length)rows.innerHTML='<tr><td colspan="2" class="empty">No tokens found.</td></tr>';
+  for(const t of data.tokens){const tr=document.createElement('tr');const a=document.createElement('td'),b=document.createElement('td');a.textContent=t.type;b.textContent=t.lexeme;tr.append(a,b);rows.append(tr);}
+  document.getElementById('tokenCount').textContent=data.tokens.length;
+  document.getElementById('errorCount').textContent=data.errors.length;
+  message.className='errorbox '+(data.errors.length?'':'good');
+  message.textContent=data.errors.length?data.errors.join('\\n'):(data.tokens.length?'Analysis completed successfully. No lexical errors found.':'Analysis completed. No tokens were produced.');
+  if(data.stderr)message.textContent+='\\n'+data.stderr;
+ }catch(e){message.className='errorbox';message.textContent='Error: '+e.message;}
+ finally{btn.disabled=false;btn.textContent='▶ Run Lexer';}
+};
+</script>
+</body>
+</html>
