@@ -53,3 +53,17 @@ This is a simplified educational LEX-inspired implementation, not a complete Lex
 
 ## Academic Purpose
 Developed as a Compiler Design mini-project to demonstrate lexical analysis, rule-based scanning, token recognition and lexical error handling.
+
+## Deploy on Render
+
+1. Push this repository to GitHub.
+2. Sign in to Render and connect your GitHub account.
+3. Create a new Web Service and select `Naina-Ohri/LEX-Tool-CPP`.
+4. Select branch `master`.
+5. Select the Docker runtime (Render detects the included Dockerfile).
+6. Choose the Free instance plan and create the service.
+7. Wait for the build and deployment to finish. Render will provide a public `onrender.com` URL.
+
+The Dockerfile installs a C++ compiler, generates the scanner from the project rules, compiles it for the Linux host, and starts the Python web server. The Windows `start.bat` launcher remains available for local use.
+
+Note: Free Render services can spin down after inactivity, so the first visit may take a little longer.

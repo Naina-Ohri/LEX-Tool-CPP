@@ -1,12 +1,13 @@
-﻿from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
+import os
 import subprocess
 import json
 import re
 import tempfile
 
 ROOT = Path(__file__).resolve().parent
-SCANNER = ROOT / "build" / "lex_style_scanner.exe"
+SCANNER = ROOT / "build" / ("lex_style_scanner.exe" if os.name == "nt" else "lex_style_scanner")
 HTML = ROOT / "web" / "index.html"
 
 class Handler(BaseHTTPRequestHandler):
@@ -98,6 +99,6 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     if not HTML.exists():
         raise SystemExit("UI file missing: web/index.html")
-    print("LEX Tool running at http://127.0.0.1:8000")
+    print("LEX Tool running on port", os.environ.get("PORT", "8000"))
     print("Open this address in your browser. Press Ctrl+C to stop.")
-    HTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+    HTTPServer(("0.0.0.0", int(os.environ.get("PORT", "8000"))), Handler).serve_forever()
